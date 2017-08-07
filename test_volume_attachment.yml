@@ -1,0 +1,85 @@
+- hosts: localhost
+  vars:
+    volname: testvol
+    devname: testdev
+    project_id: 52000fb2-ee46-4673-93a8-de2c2bdba33b
+  tasks:
+    - name: Cleanup possible previous volume
+      packet_volume:
+        description: "{{ volname }}"
+        project_id: "{{ project_id }}"
+        state: absent
+
+
+    - name: test create volume
+      packet_volume:
+        description: "{{ volname }}"
+        project_id: "{{ project_id }}"
+        facility: ewr1
+        plan: storage_1
+        state: present
+        size: 10
+        snapshot_policy:
+          snapshot_count: 10
+          snapshot_frequency: 1day
+      register: result
+
+
+    - packet_device:
+        project_id: "{{ project_id }}"
+        hostnames: "{{ devname }}"
+        operating_system: ubuntu_16_04
+        plan: baremetal_0
+        facility: ewr1
+        state: present
+
+    - name: Attach testvol to testdev
+      packet_volume_attachment:
+        project_id: "{{ project_id }}"
+        volume: "{{ volname }}"
+        device: "{{ devname }}"
+      register: result
+
+    - assert:
+       that: result.changed == True
+
+    - name: Idempotent attach testvol to testdev
+      packet_volume_attachment:
+        project_id: "{{ project_id }}"
+        volume: "{{ volname }}"
+        device: "{{ devname }}"
+      register: result
+
+    - assert:
+       that: result.changed == False
+
+    - name: Detach testvol from testdev
+      packet_volume_attachment:
+        project_id: "{{ project_id }}"
+        volume: "{{ volname }}"
+        device: "{{ devname }}"
+        state: absent
+      register: result
+
+    - assert:
+       that: result.changed == True
+
+    - name: Idempotent detach testvol from testdev
+      packet_volume_attachment:
+        project_id: "{{ project_id }}"
+        volume: "{{ volname }}"
+        device: "{{ devname }}"
+        state: absent
+      register: result
+
+    - assert:
+       that: result.changed == False
+
+    - name: test delete volume
+      packet_volume:
+        project_id: "{{ project_id }}"
+        description: "{{ volname }}"
+        state: absent
+      register: result
+
+
