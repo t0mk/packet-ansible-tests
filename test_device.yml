@@ -1,0 +1,61 @@
+- hosts: localhost
+  vars:
+    devname: testdev123
+    project_id: 52000fb2-ee46-4673-93a8-de2c2bdba33b
+    devgroup: [s1, s2, s3]
+
+  tasks:
+  - packet_device:
+      project_id:  "{{ project_id }}"
+      hostnames: "{{ devname }}"
+      state: absent
+
+  - packet_device:
+      project_id:  "{{ project_id }}"
+      hostnames: "{{ devname }}"
+      operating_system: ubuntu_16_04
+      plan: baremetal_0
+      facility: sjc1
+      state: active
+      wait_timeout: 600
+    register: result
+
+  - assert:
+      that:
+      - result.changed == True
+      - result.devices|length == 1
+
+  - packet_device:
+      project_id:  "{{ project_id }}"
+      device_ids: "{{ result.devices[0].id }}"
+      state: absent
+    register: result
+
+  - assert:
+      that:
+      - result.changed == True
+
+  - packet_device:
+      project_id:  "{{ project_id }}"
+      hostnames: "{{ devgroup }}"
+      state: absent
+
+  - packet_device:
+      project_id:  "{{ project_id }}"
+      hostnames: "{{ devgroup }}"
+      operating_system: ubuntu_16_04
+      plan: baremetal_0
+      facility: sjc1
+      state: active
+      wait_timeout: 600
+    register: result
+
+  - assert:
+      that:
+      - result.changed == True
+      - result.devices|length == 3
+
+  - packet_device:
+      project_id:  "{{ project_id }}"
+      hostnames: "{{ devgroup }}"
+      state: absent
