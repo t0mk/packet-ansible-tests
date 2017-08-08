@@ -10,3 +10,7 @@ In order to run this. you need to
 
 These playbooks create resources in the Packet host. Running it will cost you some Packet credit.
 
+## IP Address assignment test
+
+To run the `test_ip_address.yml`, you first need to allocate an Ip address to your project, and then set the values in `vars` in the playbook.
+
