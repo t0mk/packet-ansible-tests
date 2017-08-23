@@ -4,7 +4,7 @@
     project_id: 52000fb2-ee46-4673-93a8-de2c2bdba33b
     devname: testserver
 # Pick an address from a block allocated to your project.
-    address: 147.75.69.252
+    address: 147.75.90.196
   tasks:
   - packet_device:
       project_id: "{{ project_id }}"
@@ -12,6 +12,7 @@
       operating_system: ubuntu_16_04
       plan: baremetal_0
       facility: sjc1
+      state: active
 
 # NOTE: if you want to assign the IP address, you should make sure that the
 # device is in "active" state.
