@@ -2,32 +2,32 @@
   hosts: localhost
   vars:
     project_id: 52000fb2-ee46-4673-93a8-de2c2bdba33b
-    devname: testserver
+    devname: anstest5
 # Pick an address from a block allocated to your project.
-    address: 147.75.90.196
+    subnet_cidr: "147.75.66.154/32"
   tasks:
   - packet_device:
       project_id: "{{ project_id }}"
       hostnames:  "{{ devname }}"
       operating_system: ubuntu_16_04
       plan: baremetal_0
-      facility: sjc1
+      facility: ewr1
       state: active
 
 # NOTE: if you want to assign the IP address, you should make sure that the
 # device is in "active" state.
 
-  - packet_ip_address:
+  - packet_ip_subnet:
       project_id: "{{ project_id }}"
       hostname:   "{{ devname }}"
-      ip_address: "{{ address }}"
+      cidr: "{{ subnet_cidr }}"
       state: absent
     register: result
 
-  - packet_ip_address:
+  - packet_ip_subnet:
       project_id: "{{ project_id }}"
       hostname:   "{{ devname }}"
-      ip_address: "{{ address }}"
+      cidr: "{{ subnet_cidr }}"
     register: result
 
   - name: assert changed is True
@@ -35,10 +35,10 @@
       that:
       - result.changed == True
 
-  - packet_ip_address:
+  - packet_ip_subnet:
       project_id: "{{ project_id }}"
       hostname:   "{{ devname }}"
-      ip_address: "{{ address }}"
+      cidr: "{{ subnet_cidr }}"
     register: result
 
   - name: assert changed is False
@@ -47,9 +47,9 @@
       - result.changed == False
 
 
-  - packet_ip_address:
+  - packet_ip_subnet:
       project_id: "{{ project_id }}"
-      ip_address: "{{ address }}"
+      cidr: "{{ subnet_cidr }}"
       state: absent
     register: result
 
@@ -58,10 +58,10 @@
       that:
       - result.changed == True
 
-  - packet_ip_address:
+  - packet_ip_subnet:
       project_id: "{{ project_id }}"
       hostname:   "{{ devname }}"
-      ip_address: "{{ address }}"
+      cidr: "{{ subnet_cidr }}"
     register: result
 
   - name: assert changed is True
@@ -69,10 +69,10 @@
       that:
       - result.changed == True
 
-  - packet_ip_address:
+  - packet_ip_subnet:
       project_id: "{{ project_id }}"
       device_id:   "{{ result.device_id }}"
-      ip_address: "{{ address }}"
+      cidr: "{{ subnet_cidr }}"
       state: absent
     register: result
 
